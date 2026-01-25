@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# Rust
+rust/target/
+rust/pkg/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
