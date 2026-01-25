@@ -1,19 +1,8 @@
-Client-side File Encryption
+# AllCrypt - Client-side File Encryption
 
 A **100% client-side file encryption tool** built with **Rust compiled to WebAssembly**, running entirely in the browser. No backend. No upload. No server-side processing.
 
 > **File size is limited by your device, not our server.**
-
----
-
-## Key Features
-
-- Encrypt files **locally in the browser**
-- Decrypt encrypted files locally
-- Password-based encryption
-- Supports large files (GB-scale, device-dependent)
-- Smooth UI using Web Worker (non-blocking)
-- Fully static deployment
 
 ---
 
@@ -90,6 +79,17 @@ allcrypt/
     └─ build-wasm.sh
 
 ```
+
+---
+
+## Key Features
+
+- Encrypt files **locally in the browser**
+- Decrypt encrypted files locally
+- Password-based encryption
+- Supports large files (GB-scale, device-dependent)
+- Smooth UI using Web Worker (non-blocking)
+- Fully static deployment
 
 ---
 
