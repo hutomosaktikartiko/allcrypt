@@ -3,7 +3,11 @@
 
 export function add(left: number, right: number): number;
 
+export function decrypt_file(password: string, encrypted_bytes: Uint8Array): Uint8Array;
+
 export function decrypt_string(password: string, encrypted: Uint8Array): string;
+
+export function encrypt_file(password: string, file_bytes: Uint8Array, chunk_exp: number): Uint8Array;
 
 export function encrypt_string(password: string, plaintext: string): Uint8Array;
 
@@ -23,6 +27,8 @@ export interface InitOutput {
     readonly identify: (a: number, b: number) => [number, number];
     readonly encrypt_string: (a: number, b: number, c: number, d: number) => [number, number];
     readonly decrypt_string: (a: number, b: number, c: number, d: number) => [number, number, number, number];
+    readonly encrypt_file: (a: number, b: number, c: number, d: number, e: number) => [number, number];
+    readonly decrypt_file: (a: number, b: number, c: number, d: number) => [number, number, number, number];
     readonly __wbindgen_exn_store: (a: number) => void;
     readonly __externref_table_alloc: () => number;
     readonly __wbindgen_externrefs: WebAssembly.Table;

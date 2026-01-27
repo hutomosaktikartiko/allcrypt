@@ -7,6 +7,8 @@ export const invert_bytes: (a: number, b: number) => [number, number];
 export const identify: (a: number, b: number) => [number, number];
 export const encrypt_string: (a: number, b: number, c: number, d: number) => [number, number];
 export const decrypt_string: (a: number, b: number, c: number, d: number) => [number, number, number, number];
+export const encrypt_file: (a: number, b: number, c: number, d: number, e: number) => [number, number];
+export const decrypt_file: (a: number, b: number, c: number, d: number) => [number, number, number, number];
 export const __wbindgen_exn_store: (a: number) => void;
 export const __externref_table_alloc: () => number;
 export const __wbindgen_externrefs: WebAssembly.Table;

@@ -7,6 +7,11 @@ use rand::rngs::OsRng;
 use rand::RngCore;
 use wasm_bindgen::prelude::*;
 
+use crate::crypto::{decrypt::decrypt_file_bytes, encrypt::encrypt_file_bytes};
+
+mod crypto;
+mod format;
+
 #[wasm_bindgen]
 pub fn add(left: i32, right: i32) -> i32 {
     left + right
@@ -93,4 +98,14 @@ pub fn decrypt_string(password: &str, encrypted: Vec<u8>) -> Result<String, JsVa
         .map_err(|_| JsValue::from_str("Decryption failed"))?;
 
     String::from_utf8(plaintext).map_err(|_| JsValue::from_str("Invalid UTF-8"))
+}
+
+#[wasm_bindgen]
+pub fn encrypt_file(password: &str, file_bytes: Vec<u8>, chunk_exp: u8) -> Vec<u8> {
+    encrypt_file_bytes(password, &file_bytes, chunk_exp)
+}
+
+#[wasm_bindgen]
+pub fn decrypt_file(password: &str, encrypted_bytes: Vec<u8>) -> Result<Vec<u8>, JsValue> {
+    decrypt_file_bytes(password, &encrypted_bytes).map_err(|e| JsValue::from_str(e))
 }

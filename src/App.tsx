@@ -2,7 +2,17 @@ import { useEffect, useState } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
-import { initWasm, add, reverse, invert_bytes, identify, encrypt_string, decrypt_string } from "./wasm/index";
+import {
+  initWasm,
+  add,
+  reverse,
+  invert_bytes,
+  identify,
+  encrypt_string,
+  decrypt_string,
+  encrypt_file,
+  decrypt_file,
+} from "./wasm/index";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -44,6 +54,21 @@ function App() {
 
       const decrypted = decrypt_string(password, encrypted);
       console.log("Decrypted: ", decrypted);
+
+      const text = "INI FILE TEST";
+      const bytes = new TextEncoder().encode(text);
+      console.log("Original File: ", text);
+      console.log("Original File Size: ", bytes.length);
+
+      const encryptedFile = encrypt_file("passsword123", bytes, 20);
+      console.log("Encrypted File: ", encryptedFile);
+      console.log("Encrypted File Size: ", encryptedFile.length);
+
+      const decryptedFile = decrypt_file("passsword123", encryptedFile);
+      console.log("Decrypted File: ", decryptedFile);
+      console.log("Decrypted File Size: ", decryptedFile.length);
+
+      console.log("Match: ", new TextDecoder().decode(decryptedFile) === text);
     })();
   }, []);
 
