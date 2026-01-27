@@ -1,8 +1,13 @@
 import { useEffect, useRef, useState } from "react";
+import type { WorkerRequest } from "../worker/types";
 
 export function useEncryptionWorker() {
   const workerRef = useRef<Worker | null>(null);
   const [ready, setReady] = useState(false);
+  const [progress, setProgress] = useState<{
+    done: number;
+    total: number;
+  } | null>(null);
   const [result, setResult] = useState<Uint8Array | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -21,6 +26,10 @@ export function useEncryptionWorker() {
         setReady(true);
       }
 
+      if (msg.type === "PROGRESS") {
+        setProgress({ done: msg.processed, total: msg.total });
+      }
+
       if (msg.type === "DONE") {
         setResult(msg.result);
       }
@@ -37,32 +46,33 @@ export function useEncryptionWorker() {
     return () => worker.terminate();
   }, []);
 
-  function encrypt(password: string, fileBytes: Uint8Array, chunkExp = 20) {
+  function encryptStream(password: string, file: File, chunkExp = 20) {
     setResult(null);
     setError(null);
     workerRef.current?.postMessage({
-      type: "ENCRYPT",
+      type: "ENCRYPT_STREAM",
       password,
-      fileBytes,
+      file,
       chunkExp,
-    });
+    } as WorkerRequest);
   }
 
-  function decrypt(password: string, encryptedBytes: Uint8Array) {
+  function decryptStream(password: string, file: File) {
     setResult(null);
     setError(null);
     workerRef.current?.postMessage({
-      type: "DECRYPT",
+      type: "DECRYPT_STREAM",
       password,
-      encryptedBytes,
-    });
+      file,
+    } as WorkerRequest);
   }
 
   return {
     ready,
     result,
     error,
-    encrypt,
-    decrypt,
+    progress,
+    encryptStream,
+    decryptStream,
   };
 }

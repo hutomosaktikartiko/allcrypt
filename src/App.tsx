@@ -1,43 +1,27 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
 
 import { useEncryptionWorker } from "./hooks/useEncryptionWorker";
 
 export default function App() {
-  const { ready, result, encrypt, decrypt } = useEncryptionWorker();
+  const { ready, result, encryptStream, decryptStream, progress } =
+    useEncryptionWorker();
 
-  const [encrypted, setEncrypted] = useState<Uint8Array | null>(null);
+  function onFile(e: React.ChangeEvent<HTMLInputElement>) {
+    if (!e.target.files?.[0]) return;
 
-  useEffect(() => {
-    if (!ready) return;
-
-    const password = "password123";
-    const text = "INI FILE TEST";
-    const original = new TextEncoder().encode(text);
-
-    encrypt(password, original);
-  }, [ready]);
-
-  useEffect(() => {
-    if (!result || encrypted) return;
-
-    console.log("Encrypted file size:", result.length);
-    setEncrypted(result);
-
-    decrypt("password123", result);
-  }, [result]);
-
-  useEffect(() => {
-    if (!encrypted || !result) return;
-
-    const text = new TextDecoder().decode(result);
-    console.log("Decrypted:", text);
-  }, [encrypted, result]);
+    encryptStream("password123", e.target.files[0]);
+  }
 
   return (
-    <div className="p-4">
-      <p>Worker ready: {String(ready)}</p>
-      <p>Result: {result}</p>
+    <div className="p-4 space-y-2">
+      <input type="file" onChange={onFile} />
+
+      {progress && (
+        <p>Progress: {Math.round((progress.done / progress.total) * 100)}%</p>
+      )}
+
+      {result && <p>Encrypted size: {result.length / 1024} KB </p>}
     </div>
   );
 }
