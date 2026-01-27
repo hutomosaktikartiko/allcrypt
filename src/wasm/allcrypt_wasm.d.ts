@@ -1,41 +1,60 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export function add(left: number, right: number): number;
+export class DecodedHeader {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    readonly base_nonce: Uint8Array;
+    readonly chunk_exp: number;
+    readonly original_size: bigint;
+    readonly salt: Uint8Array;
+}
 
-export function decrypt_file(password: string, encrypted_bytes: Uint8Array): Uint8Array;
+export class EncryptInitResult {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    readonly base_nonce: Uint8Array;
+    readonly header: Uint8Array;
+    readonly key: Uint8Array;
+}
 
-export function decrypt_string(password: string, encrypted: Uint8Array): string;
+export function decode_header_wasm(header_bytes: Uint8Array): DecodedHeader;
 
-export function encrypt_file(password: string, file_bytes: Uint8Array, chunk_exp: number): Uint8Array;
+export function decrypt_chunk_wasm(key: Uint8Array, base_nonce: Uint8Array, chunk_index: number, encrypted_chunk: Uint8Array): Uint8Array;
 
-export function encrypt_string(password: string, plaintext: string): Uint8Array;
+export function derive_key_wasm(password: string, salt: Uint8Array): Uint8Array;
 
-export function identify(input: Uint8Array): Uint8Array;
+export function encrypt_chunk_wasm(key: Uint8Array, base_nonce: Uint8Array, chunk_index: number, chunk: Uint8Array): Uint8Array;
 
-export function invert_bytes(input: Uint8Array): Uint8Array;
-
-export function reverse(input: string): string;
+export function init_encrypt(password: string, file_size: bigint, chunk_exp: number): EncryptInitResult;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
     readonly memory: WebAssembly.Memory;
-    readonly add: (a: number, b: number) => number;
-    readonly reverse: (a: number, b: number) => [number, number];
-    readonly invert_bytes: (a: number, b: number) => [number, number];
-    readonly identify: (a: number, b: number) => [number, number];
-    readonly encrypt_string: (a: number, b: number, c: number, d: number) => [number, number];
-    readonly decrypt_string: (a: number, b: number, c: number, d: number) => [number, number, number, number];
-    readonly encrypt_file: (a: number, b: number, c: number, d: number, e: number) => [number, number];
-    readonly decrypt_file: (a: number, b: number, c: number, d: number) => [number, number, number, number];
+    readonly __wbg_encryptinitresult_free: (a: number, b: number) => void;
+    readonly encryptinitresult_header: (a: number) => [number, number];
+    readonly encryptinitresult_key: (a: number) => [number, number];
+    readonly encryptinitresult_base_nonce: (a: number) => [number, number];
+    readonly __wbg_decodedheader_free: (a: number, b: number) => void;
+    readonly decodedheader_chunk_exp: (a: number) => number;
+    readonly decodedheader_salt: (a: number) => [number, number];
+    readonly decodedheader_base_nonce: (a: number) => [number, number];
+    readonly decodedheader_original_size: (a: number) => bigint;
+    readonly init_encrypt: (a: number, b: number, c: bigint, d: number) => number;
+    readonly encrypt_chunk_wasm: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => [number, number];
+    readonly decode_header_wasm: (a: number, b: number) => [number, number, number];
+    readonly derive_key_wasm: (a: number, b: number, c: number, d: number) => [number, number, number, number];
+    readonly decrypt_chunk_wasm: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => [number, number, number, number];
     readonly __wbindgen_exn_store: (a: number) => void;
     readonly __externref_table_alloc: () => number;
     readonly __wbindgen_externrefs: WebAssembly.Table;
     readonly __wbindgen_malloc: (a: number, b: number) => number;
-    readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
     readonly __externref_table_dealloc: (a: number) => void;
     readonly __wbindgen_free: (a: number, b: number, c: number) => void;
+    readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
     readonly __wbindgen_start: () => void;
 }
 

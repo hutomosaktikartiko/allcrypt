@@ -149,20 +149,20 @@ Result is streamed and downloaded as single file
 
 ### Cryptography
 
-- [ ] Argon2id key derivation
-- [ ] AES-256-GCM encryption
-- [ ] Chunk-based encryption
-- [ ] Authentication tag validation
-- [ ] Wrong-password detection
-- [ ] Corrupted-file detection
+- [x] Argon2id key derivation
+- [x] AES-256-GCM encryption
+- [x] Chunk-based encryption
+- [x] Authentication tag validation
+- [x] Wrong-password detection
+- [x] Corrupted-file detection
 
 ### Web Worker
 
-- [ ] Worker setup
-- [ ] WASM loading inside worker
-- [ ] Main thread ↔ Worker messaging
-- [ ] Progress reporting
-- [ ] Auto-cancel on reload / close
+- [x] Worker setup
+- [x] WASM loading inside worker
+- [x] Main thread ↔ Worker messaging
+- [x] Progress reporting
+- [x] Auto-cancel on reload / close
 
 ### UI/UX
 
@@ -174,7 +174,7 @@ Result is streamed and downloaded as single file
 
 ### Build & Deploy
 
-- [ ] Vite + WASM integration
-- [ ] Bun-based local dev
+- [x] Vite + WASM integration
+- [x] Bun-based local dev
 - [ ] Production build
 - [ ] Deploy to Cloudflare Pages
