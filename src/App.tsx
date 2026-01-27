@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
+import { initWasm, add, reverse, invert_bytes, identify, encrypt_string, decrypt_string } from "./wasm/index";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -16,6 +17,34 @@ function App() {
     worker.postMessage({ type: "PING" });
 
     return () => worker.terminate();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      await initWasm();
+      console.log(add(2, 3));
+      console.log(reverse("Hello"));
+
+      const original = new Uint8Array([0, 1, 2, 127, 128, 255]);
+
+      const inverted = invert_bytes(original);
+      const restored = invert_bytes(inverted);
+      const same = identify(original);
+
+      console.log("Original: ", original);
+      console.log("Inverted: ", inverted);
+      console.log("Restored: ", restored);
+      console.log("Same: ", same);
+
+      const password = "LoveAmericano99!";
+      const message = "Hello Allcrypt";
+
+      const encrypted = encrypt_string(password, message);
+      console.log("Encrypted: ", encrypted);
+
+      const decrypted = decrypt_string(password, encrypted);
+      console.log("Decrypted: ", decrypted);
+    })();
   }, []);
 
   return (

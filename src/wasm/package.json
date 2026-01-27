@@ -1,0 +1,15 @@
+{
+  "name": "allcrypt_wasm",
+  "type": "module",
+  "version": "0.1.0",
+  "files": [
+    "allcrypt_wasm_bg.wasm",
+    "allcrypt_wasm.js",
+    "allcrypt_wasm.d.ts"
+  ],
+  "main": "allcrypt_wasm.js",
+  "types": "allcrypt_wasm.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
