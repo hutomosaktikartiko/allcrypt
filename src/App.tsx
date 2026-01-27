@@ -1,101 +1,43 @@
 import { useEffect, useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
 import "./App.css";
-import {
-  initWasm,
-  add,
-  reverse,
-  invert_bytes,
-  identify,
-  encrypt_string,
-  decrypt_string,
-  encrypt_file,
-  decrypt_file,
-} from "./wasm/index";
 
-function App() {
-  const [count, setCount] = useState(0);
+import { useEncryptionWorker } from "./hooks/useEncryptionWorker";
+
+export default function App() {
+  const { ready, result, encrypt, decrypt } = useEncryptionWorker();
+
+  const [encrypted, setEncrypted] = useState<Uint8Array | null>(null);
 
   useEffect(() => {
-    const worker = new Worker(
-      new URL("./worker/crypto.worker.ts", import.meta.url),
-      { type: "module" },
-    );
+    if (!ready) return;
 
-    worker.onmessage = (e) => console.log(e.data);
-    worker.postMessage({ type: "PING" });
+    const password = "password123";
+    const text = "INI FILE TEST";
+    const original = new TextEncoder().encode(text);
 
-    return () => worker.terminate();
-  }, []);
+    encrypt(password, original);
+  }, [ready]);
 
   useEffect(() => {
-    (async () => {
-      await initWasm();
-      console.log(add(2, 3));
-      console.log(reverse("Hello"));
+    if (!result || encrypted) return;
 
-      const original = new Uint8Array([0, 1, 2, 127, 128, 255]);
+    console.log("Encrypted file size:", result.length);
+    setEncrypted(result);
 
-      const inverted = invert_bytes(original);
-      const restored = invert_bytes(inverted);
-      const same = identify(original);
+    decrypt("password123", result);
+  }, [result]);
 
-      console.log("Original: ", original);
-      console.log("Inverted: ", inverted);
-      console.log("Restored: ", restored);
-      console.log("Same: ", same);
+  useEffect(() => {
+    if (!encrypted || !result) return;
 
-      const password = "LoveAmericano99!";
-      const message = "Hello Allcrypt";
-
-      const encrypted = encrypt_string(password, message);
-      console.log("Encrypted: ", encrypted);
-
-      const decrypted = decrypt_string(password, encrypted);
-      console.log("Decrypted: ", decrypted);
-
-      const text = "INI FILE TEST";
-      const bytes = new TextEncoder().encode(text);
-      console.log("Original File: ", text);
-      console.log("Original File Size: ", bytes.length);
-
-      const encryptedFile = encrypt_file("passsword123", bytes, 20);
-      console.log("Encrypted File: ", encryptedFile);
-      console.log("Encrypted File Size: ", encryptedFile.length);
-
-      const decryptedFile = decrypt_file("passsword123", encryptedFile);
-      console.log("Decrypted File: ", decryptedFile);
-      console.log("Decrypted File Size: ", decryptedFile.length);
-
-      console.log("Match: ", new TextDecoder().decode(decryptedFile) === text);
-    })();
-  }, []);
+    const text = new TextDecoder().decode(result);
+    console.log("Decrypted:", text);
+  }, [encrypted, result]);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div className="p-4">
+      <p>Worker ready: {String(ready)}</p>
+      <p>Result: {result}</p>
+    </div>
   );
 }
-
-export default App;
