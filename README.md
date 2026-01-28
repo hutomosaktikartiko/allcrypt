@@ -104,7 +104,7 @@ allcrypt/
 
 ### Frontend
 
-- **React**: UI framework
+- **React v19**: UI framework
 - **Vite**: Build tool
 - **Tailwind CSS**: Styling
 
@@ -139,13 +139,13 @@ Result is streamed and downloaded as single file
 
 ### Core Functionality
 
-- [ ] Select single file
-- [ ] Input password
-- [ ] Generate secure password (frontend)
-- [ ] Encyrpt file
-- [ ] Download encyrpted file (.enc)
-- [ ] Decrypt encrypted file
-- [ ] Download decrypted file
+- [x] Select single file
+- [x] Input password
+- [x] Generate secure password (frontend)
+- [x] Encyrpt file
+- [x] Download encyrpted file (.enc)
+- [x] Decrypt encrypted file
+- [x] Download decrypted file
 
 ### Cryptography
 
@@ -164,13 +164,22 @@ Result is streamed and downloaded as single file
 - [x] Progress reporting
 - [x] Auto-cancel on reload / close
 
+### Performance Optimization
+
+- [ ] Clear memory buffers after download/clear result
+- [ ] Streaming output to disk instead of memory
+
+### Security
+
+- [ ] Hardening side-channel attacks
+
 ### UI/UX
 
-- [ ] File picker
+- [x] File picker
 - [ ] Password strength indicator
-- [ ] Progress bar
-- [ ] Error messages (wrong password, invalid file)
-- [ ] Clear warnings for large files
+- [x] Progress bar
+- [x] Error messages (wrong password, invalid file)
+- [x] Clear warnings for large files
 
 ### Build & Deploy
 

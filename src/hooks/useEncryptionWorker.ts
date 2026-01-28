@@ -46,7 +46,7 @@ export function useEncryptionWorker() {
     return () => worker.terminate();
   }, []);
 
-  function encryptStream(password: string, file: File, chunkExp = 20) {
+  function encryptStream(file: File, password: string, chunkExp = 20) {
     setResult(null);
     setError(null);
     workerRef.current?.postMessage({
@@ -57,7 +57,7 @@ export function useEncryptionWorker() {
     } as WorkerRequest);
   }
 
-  function decryptStream(password: string, file: File) {
+  function decryptStream(file: File, password: string) {
     setResult(null);
     setError(null);
     workerRef.current?.postMessage({
