@@ -199,9 +199,6 @@ export default function App() {
     URL.revokeObjectURL(url);
 
     showToast("success", "File downloaded successfully!");
-
-    // Clear result from worker
-    clearResult();
   };
 
   const handleReset = () => {
