@@ -1,0 +1,9 @@
+{
+  "name": "allcrypt",
+  "compatibility_date": "2026-01-29",
+  "compatibility_flags": [ "wasm_modules" ],
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS"
+  }
+}
