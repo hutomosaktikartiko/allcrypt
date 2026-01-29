@@ -167,7 +167,7 @@ Result is streamed and downloaded as single file
 ### Performance Optimization
 
 - [x] Clear memory buffers after download/clear result
-- [ ] Streaming output to OPFS instead of memory
+- [x] Streaming output to OPFS instead of memory
 
 ### Security
 

@@ -12,6 +12,10 @@ const HEADER_SIZE = 44;
 
 let initialized = false;
 
+interface FlushableWritableStream extends FileSystemWritableFileStream {
+  flush?(): Promise<void>;
+}
+
 function zeroBuffer(buffer: Uint8Array): void {
   buffer.fill(0);
 }
@@ -51,7 +55,7 @@ self.onmessage = async (e) => {
       const initResult = init_encrypt(password, BigInt(file.size), chunkExp);
 
       if (useOPFS && opfsFilename) {
-        const writable = await createOPFSFile(opfsFilename);
+        const writable = await createOPFSFile(opfsFilename) as FlushableWritableStream;
 
         // Write headers
         await writable.write(initResult.header as Uint8Array<ArrayBuffer>);
@@ -77,6 +81,11 @@ self.onmessage = async (e) => {
           // Wite to OPFS
           await writable.write(encryptedChunk as Uint8Array<ArrayBuffer>);
           totalWritten += encryptedChunk.length;
+
+          // Flush every 50 chunks
+          if (chunkIndex % 50 === 0 && chunkIndex > 0) {
+            await writable.flush?.();
+          }
 
           // Clear encrypted chunk buffer
           zeroBuffer(encryptedChunk);
@@ -168,7 +177,7 @@ self.onmessage = async (e) => {
       const originalSize = Number(header.original_size);
 
       if (useOPFS && opfsFilename) {
-        const writable = await createOPFSFile(opfsFilename);
+        const writable = await createOPFSFile(opfsFilename) as FlushableWritableStream;
 
         let totalWritten = 0;
 
@@ -198,6 +207,11 @@ self.onmessage = async (e) => {
           await writable.write(chunkToWrite as Uint8Array<ArrayBuffer>);
           produced += decryptedChunk.length;
           totalWritten += decryptedChunk.length;
+
+          // Flush every 50 chunks
+          if (chunkIndex % 50 === 0 && chunkIndex > 0) {
+            await writable.flush?.();
+          }
 
           // Clear decryptedChunk buffer
           zeroBuffer(decryptedChunk);
