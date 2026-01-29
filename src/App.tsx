@@ -34,6 +34,7 @@ export default function App() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const prevResultRef = useRef<Uint8Array | null>(null);
   const prevErrorRef = useRef<string | null>(null);
+  const prevOpfsFilenameRef = useRef<string | null>(null);
 
   const {
     result,
@@ -42,16 +43,23 @@ export default function App() {
     encryptStream,
     decryptStream,
     clearResult,
+    opfsFilename,
+    encryptStreamOPFS,
+    decryptStreamOPFS,
+    downloadFromOPFS,
+    cleanUpOPFS,
+    isOPFSAvailable,
   } = useEncryptionWorker();
 
-  const isProcessing = hasStarted && !result && !error;
-  const isFinished = hasStarted && result !== null;
+  const isProcessing = hasStarted && !result && !opfsFilename && !error;
+  const isFinished = hasStarted && (result !== null || opfsFilename !== null);
   const processedData = result;
   const progressPercent =
     progress && progress.total > 0
       ? (progress.done / progress.total) * 100
       : 0;
   const isLocked = isProcessing || isFinished;
+  const useOpfs = isOPFSAvailable() && file && file.size > 100 * 1024 * 1024; // Use OPFS for files larger than 100MB
 
   const formatBytes = (bytes: number, decimals = 2) => {
     if (!bytes) return "0 Bytes";
@@ -79,7 +87,10 @@ export default function App() {
   }, [toast]);
 
   useEffect(() => {
-    if (result && result !== prevResultRef.current && hasStarted) {
+    const resultChanged = result && result !== prevResultRef.current;
+    const opfsChanged = opfsFilename && opfsFilename !== prevOpfsFilenameRef.current;
+
+    if ((resultChanged || opfsChanged) && hasStarted) {
       queueMicrotask(() => {
         showToast(
           "success",
@@ -87,8 +98,10 @@ export default function App() {
         );
       });
     }
+    
     prevResultRef.current = result;
-  }, [result, hasStarted, mode]);
+    prevOpfsFilenameRef.current = opfsFilename;
+  }, [result, hasStarted, mode, opfsFilename]);
 
   useEffect(() => {
     if (error && error !== prevErrorRef.current && hasStarted) {
@@ -163,40 +176,55 @@ export default function App() {
     document.body.removeChild(textArea);
   };
 
-  const handleAction = () => {
+  const handleStart = () => {
     if (!file || !password) return;
 
     setHasStarted(true);
 
-    if (mode === "encrypt") {
+    if (useOpfs) {
+      if (mode === "encrypt") {
+        encryptStreamOPFS(file, password);
+      } else {
+        decryptStreamOPFS(file, password);
+      }
+    } else {
+      if (mode === "encrypt") {
       encryptStream(file, password);
     } else {
       decryptStream(file, password);
     }
+    }
   };
 
   const handleDownload = () => {
-    if (!processedData || !file) return;
+    if (!file) return;
 
-    const buf = processedData.buffer.slice(
-      processedData.byteOffset,
-      processedData.byteOffset + processedData.byteLength
-    ) as ArrayBuffer;
-    const blob = new Blob([buf]);
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    if (mode === "encrypt") {
-      a.download = `${file.name}.allcrypt`;
+    if (opfsFilename) {
+      const downloadName = mode === "encrypt"
+      ? `${file.name}.allcrypt`
+      : file.name.replace('.allcrypt', '');
+      downloadFromOPFS(downloadName);
     } else {
-      if (file.name.endsWith(".allcrypt")) {
-        a.download = file.name.slice(0, -9);
-      }
-    }
-    a.click();
+      if (!processedData) return;
+      
+      const buf = processedData.buffer.slice(
+        processedData.byteOffset,
+        processedData.byteOffset + processedData.byteLength
+      ) as ArrayBuffer;
+      const blob = new Blob([buf]);
+      const url = URL.createObjectURL(blob);
 
-    URL.revokeObjectURL(url);
+      const a = document.createElement("a");
+      a.href = url;
+      if (mode === "encrypt") {
+        a.download = `${file.name}.allcrypt`;
+      } else {
+        a.download = file.name.replace('.allcrypt', '');
+      }
+
+      a.click();
+      URL.revokeObjectURL(url);
+    }
 
     showToast("success", "File downloaded successfully!");
   };
@@ -208,6 +236,8 @@ export default function App() {
 
     // Clear result from worker
     clearResult();
+    // Clean opfs
+    cleanUpOPFS();
   };
 
   // ============ RENDER ============
@@ -435,7 +465,7 @@ export default function App() {
             ) : (
               // 3. Initial State (Start Button)
               <button
-                onClick={handleAction}
+                onClick={handleStart}
                 disabled={!file || !password}
                 className={`w-full py-4 rounded-xl text-white font-bold text-lg shadow-lg shadow-indigo-200 flex items-center justify-center gap-2 transition-all transform active:scale-[0.98]
                   ${

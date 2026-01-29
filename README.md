@@ -167,11 +167,11 @@ Result is streamed and downloaded as single file
 ### Performance Optimization
 
 - [x] Clear memory buffers after download/clear result
-- [ ] Streaming output to disk instead of memory
+- [ ] Streaming output to OPFS instead of memory
 
 ### Security
 
-- [ ] Hardening side-channel attacks
+- [x] Hardening side-channel attacks
 
 ### UI/UX
 
