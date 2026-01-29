@@ -12,3 +12,4 @@ argon2 = "0.5"
 rand = "0.8"
 aes-gcm = "0.10"
 getrandom = { version = "0.2", features = ["js"] }
+zeroize = { version = "1.8", features = ["zeroize_derive"] }

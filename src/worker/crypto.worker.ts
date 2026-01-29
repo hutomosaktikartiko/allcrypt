@@ -11,6 +11,15 @@ const HEADER_SIZE = 44;
 
 let initialized = false;
 
+function zeroBuffer(buffer: Uint8Array): void {
+  buffer.fill(0);
+}
+
+function zeroBufferArray(buffers: Uint8Array[]): void {
+  for (const buf of buffers) buf.fill(0);
+  buffers.length = 0;
+}
+
 async function initWasm() {
   if (!initialized) {
     await init();
@@ -57,17 +66,24 @@ self.onmessage = async (e) => {
           data,
         );
 
-        chunks.push(encryptedChunk);
+        // Clear data buffer
+        zeroBuffer(data);
 
         offset += data.length;
-        chunkIndex++;
+        chunks.push(encryptedChunk);
 
         self.postMessage({
           type: "PROGRESS",
           processed: offset,
           total: file.size,
         });
+
+        chunkIndex++;
       }
+
+      // Clear sensitive data
+      initResult.clear();
+      initResult.free();
 
       // concat output
       const totalSize = chunks.reduce((s, c) => s + c.length, 0);
@@ -77,6 +93,9 @@ self.onmessage = async (e) => {
         result.set(c, pos);
         pos += c.length;
       }
+      
+      // Clear chunk buffers
+      zeroBufferArray(chunks);
 
       self.postMessage({ type: "DONE", result });
     }
@@ -114,6 +133,9 @@ self.onmessage = async (e) => {
 
         const plain = decrypt_chunk_wasm(key, baseNonce, chunkIndex, encChunk);
 
+        // Clear encChunk buffer
+        zeroBuffer(encChunk);
+
         outChunks.push(plain);
         produced += plain.length;
 
@@ -127,6 +149,12 @@ self.onmessage = async (e) => {
         });
       }
 
+      // Clear sensitive data
+      key.fill(0);
+      baseNonce.fill(0);
+      header.clear();
+      header.free();
+
       // Concat output
       const total = outChunks.reduce((s, c) => s + c.length, 0);
       const result = new Uint8Array(total);
@@ -135,6 +163,10 @@ self.onmessage = async (e) => {
         result.set(c, pos);
         pos += c.length;
       }
+
+      // Clear outChunks buffers
+      zeroBufferArray(outChunks);
+
       const finalResult =
         result.length > originalSize
           ? result.subarray(0, originalSize)
@@ -142,7 +174,11 @@ self.onmessage = async (e) => {
 
       self.postMessage({ type: "DONE", result: finalResult });
     }
-  } catch (err: any) {
+
+    if (msg.type === "CLEAR_RESULT") {
+      self.postMessage({ type: "CLEARED" });
+    }
+  } catch (err) {
     self.postMessage({
       type: "ERROR",
       message: err?.toString() ?? "Worker error",

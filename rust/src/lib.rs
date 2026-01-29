@@ -1,5 +1,6 @@
 use argon2::Argon2;
 use wasm_bindgen::prelude::*;
+use zeroize::{Zeroize, ZeroizeOnDrop};
 
 use crate::{
     crypto::{
@@ -11,8 +12,9 @@ use crate::{
 mod crypto;
 mod format;
 
-#[allow(dead_code)]
 #[wasm_bindgen]
+#[allow(dead_code)]
+#[derive(Zeroize, ZeroizeOnDrop)]
 pub struct EncryptInitResult {
     header: Vec<u8>,
     key: Vec<u8>,
@@ -35,9 +37,16 @@ impl EncryptInitResult {
     pub fn base_nonce(&self) -> Vec<u8> {
         self.base_nonce.clone()
     }
+
+    pub fn clear(&mut self) {
+        self.header.zeroize();
+        self.key.zeroize();
+        self.base_nonce.zeroize();
+    }
 }
 
 #[wasm_bindgen]
+#[derive(Zeroize, ZeroizeOnDrop)]
 pub struct DecodedHeader {
     chunk_exp: u8,
     salt: Vec<u8>,
@@ -65,6 +74,13 @@ impl DecodedHeader {
     #[wasm_bindgen(getter)]
     pub fn original_size(&self) -> u64 {
         self.original_size
+    }
+
+    pub fn clear(&mut self) {
+        self.chunk_exp.zeroize();
+        self.salt.zeroize();
+        self.base_nonce.zeroize();
+        self.original_size.zeroize();
     }
 }
 
@@ -116,7 +132,9 @@ pub fn derive_key_wasm(password: &str, salt: Vec<u8>) -> Result<Vec<u8>, JsValue
         .hash_password_into(password.as_bytes(), &salt, &mut key)
         .map_err(|_| JsValue::from_str("Key derivation failed"))?;
 
-    Ok(key.to_vec())
+    let result = key.to_vec();
+    key.zeroize();
+    Ok(result)
 }
 
 #[wasm_bindgen]

@@ -41,9 +41,9 @@ export default function App() {
     progress,
     encryptStream,
     decryptStream,
+    clearResult,
   } = useEncryptionWorker();
 
-  // ✅ DERIVED STATE - no useEffect needed for these
   const isProcessing = hasStarted && !result && !error;
   const isFinished = hasStarted && result !== null;
   const processedData = result;
@@ -53,7 +53,6 @@ export default function App() {
       : 0;
   const isLocked = isProcessing || isFinished;
 
-  // ============ HELPER FUNCTIONS ============
   const formatBytes = (bytes: number, decimals = 2) => {
     if (!bytes) return "0 Bytes";
 
@@ -69,8 +68,6 @@ export default function App() {
     setToast({ type, message });
   };
 
-  // ============ EFFECTS ============
-  // Auto-hide toast after 3 seconds
   useEffect(() => {
     if (!toast) return;
 
@@ -81,10 +78,8 @@ export default function App() {
     return () => clearTimeout(timer);
   }, [toast]);
 
-  // Show success toast when result changes (not on mount)
   useEffect(() => {
     if (result && result !== prevResultRef.current && hasStarted) {
-      // Use queueMicrotask to defer setState (React 19 requirement)
       queueMicrotask(() => {
         showToast(
           "success",
@@ -95,10 +90,8 @@ export default function App() {
     prevResultRef.current = result;
   }, [result, hasStarted, mode]);
 
-  // Show error toast when error changes (not on mount)
   useEffect(() => {
     if (error && error !== prevErrorRef.current && hasStarted) {
-      // Use queueMicrotask to defer setState (React 19 requirement)
       queueMicrotask(() => {
         showToast("error", error);
       });
@@ -106,7 +99,6 @@ export default function App() {
     prevErrorRef.current = error;
   }, [error, hasStarted]);
 
-  // ============ HANDLERS ============
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files?.[0]) return;
 
@@ -207,12 +199,18 @@ export default function App() {
     URL.revokeObjectURL(url);
 
     showToast("success", "File downloaded successfully!");
+
+    // Clear result from worker
+    clearResult();
   };
 
   const handleReset = () => {
     setHasStarted(false);
     setToast(null);
     setFile(null);
+
+    // Clear result from worker
+    clearResult();
   };
 
   // ============ RENDER ============

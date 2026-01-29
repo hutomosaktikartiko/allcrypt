@@ -5,6 +5,7 @@ export class DecodedHeader {
     private constructor();
     free(): void;
     [Symbol.dispose](): void;
+    clear(): void;
     readonly base_nonce: Uint8Array;
     readonly chunk_exp: number;
     readonly original_size: bigint;
@@ -15,6 +16,7 @@ export class EncryptInitResult {
     private constructor();
     free(): void;
     [Symbol.dispose](): void;
+    clear(): void;
     readonly base_nonce: Uint8Array;
     readonly header: Uint8Array;
     readonly key: Uint8Array;
@@ -38,11 +40,13 @@ export interface InitOutput {
     readonly encryptinitresult_header: (a: number) => [number, number];
     readonly encryptinitresult_key: (a: number) => [number, number];
     readonly encryptinitresult_base_nonce: (a: number) => [number, number];
+    readonly encryptinitresult_clear: (a: number) => void;
     readonly __wbg_decodedheader_free: (a: number, b: number) => void;
     readonly decodedheader_chunk_exp: (a: number) => number;
     readonly decodedheader_salt: (a: number) => [number, number];
     readonly decodedheader_base_nonce: (a: number) => [number, number];
     readonly decodedheader_original_size: (a: number) => bigint;
+    readonly decodedheader_clear: (a: number) => void;
     readonly init_encrypt: (a: number, b: number, c: bigint, d: number) => number;
     readonly encrypt_chunk_wasm: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => [number, number];
     readonly decode_header_wasm: (a: number, b: number) => [number, number, number];

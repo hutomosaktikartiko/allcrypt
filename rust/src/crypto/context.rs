@@ -1,12 +1,15 @@
 use argon2::Argon2;
 use rand::rngs::OsRng;
 use rand::RngCore;
+use zeroize::{Zeroize, ZeroizeOnDrop};
 
 use crate::format::header::{FileHeader, CIPHER_AES_256_GCM, KDF_ARGON2ID, VERSION};
 
+#[derive(Zeroize, ZeroizeOnDrop)]
 pub struct EncryptionContext {
     pub key: [u8; 32],
     pub base_nonce: [u8; 12],
+    #[zeroize(skip)]
     pub header: FileHeader,
 }
 

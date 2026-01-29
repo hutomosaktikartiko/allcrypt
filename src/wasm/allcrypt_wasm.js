@@ -34,6 +34,9 @@ export class DecodedHeader {
         const ret = wasm.decodedheader_chunk_exp(this.__wbg_ptr);
         return ret;
     }
+    clear() {
+        wasm.decodedheader_clear(this.__wbg_ptr);
+    }
     /**
      * @returns {bigint}
      */
@@ -79,6 +82,9 @@ export class EncryptInitResult {
         var v1 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
         wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
         return v1;
+    }
+    clear() {
+        wasm.encryptinitresult_clear(this.__wbg_ptr);
     }
     /**
      * @returns {Uint8Array}

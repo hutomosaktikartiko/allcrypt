@@ -166,7 +166,7 @@ Result is streamed and downloaded as single file
 
 ### Performance Optimization
 
-- [ ] Clear memory buffers after download/clear result
+- [x] Clear memory buffers after download/clear result
 - [ ] Streaming output to disk instead of memory
 
 ### Security
