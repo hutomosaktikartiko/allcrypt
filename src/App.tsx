@@ -13,6 +13,7 @@ import {
   IconClose,
   IconDownload,
   IconReset,
+  IconGithub,
 } from "./components/Icons";
 import { useEncryptionWorker } from "./hooks/useEncryptionWorker";
 
@@ -55,9 +56,7 @@ export default function App() {
   const isFinished = hasStarted && (result !== null || opfsFilename !== null);
   const processedData = result;
   const progressPercent =
-    progress && progress.total > 0
-      ? (progress.done / progress.total) * 100
-      : 0;
+    progress && progress.total > 0 ? (progress.done / progress.total) * 100 : 0;
   const isLocked = isProcessing || isFinished;
   const useOpfs = isOPFSAvailable() && file && file.size > 100 * 1024 * 1024; // Use OPFS for files larger than 100MB
 
@@ -88,17 +87,18 @@ export default function App() {
 
   useEffect(() => {
     const resultChanged = result && result !== prevResultRef.current;
-    const opfsChanged = opfsFilename && opfsFilename !== prevOpfsFilenameRef.current;
+    const opfsChanged =
+      opfsFilename && opfsFilename !== prevOpfsFilenameRef.current;
 
     if ((resultChanged || opfsChanged) && hasStarted) {
       queueMicrotask(() => {
         showToast(
           "success",
-          `${mode === "encrypt" ? "Encryption" : "Decryption"} process complete!`
+          `${mode === "encrypt" ? "Encryption" : "Decryption"} process complete!`,
         );
       });
     }
-    
+
     prevResultRef.current = result;
     prevOpfsFilenameRef.current = opfsFilename;
   }, [result, hasStarted, mode, opfsFilename]);
@@ -189,10 +189,10 @@ export default function App() {
       }
     } else {
       if (mode === "encrypt") {
-      encryptStream(file, password);
-    } else {
-      decryptStream(file, password);
-    }
+        encryptStream(file, password);
+      } else {
+        decryptStream(file, password);
+      }
     }
   };
 
@@ -200,16 +200,17 @@ export default function App() {
     if (!file) return;
 
     if (opfsFilename) {
-      const downloadName = mode === "encrypt"
-      ? `${file.name}.allcrypt`
-      : file.name.replace('.allcrypt', '');
+      const downloadName =
+        mode === "encrypt"
+          ? `${file.name}.allcrypt`
+          : file.name.replace(".allcrypt", "");
       downloadFromOPFS(downloadName);
     } else {
       if (!processedData) return;
-      
+
       const buf = processedData.buffer.slice(
         processedData.byteOffset,
-        processedData.byteOffset + processedData.byteLength
+        processedData.byteOffset + processedData.byteLength,
       ) as ArrayBuffer;
       const blob = new Blob([buf]);
       const url = URL.createObjectURL(blob);
@@ -219,7 +220,7 @@ export default function App() {
       if (mode === "encrypt") {
         a.download = `${file.name}.allcrypt`;
       } else {
-        a.download = file.name.replace('.allcrypt', '');
+        a.download = file.name.replace(".allcrypt", "");
       }
 
       a.click();
@@ -242,7 +243,7 @@ export default function App() {
 
   // ============ RENDER ============
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans flex items-center justify-center p-4 selection:bg-indigo-100 selection:text-indigo-900">
+    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans flex flex-col items-center justify-center p-4 selection:bg-indigo-100 selection:text-indigo-900">
       {/* Main Card */}
       <div className="w-full max-w-xl bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden relative">
         {/* === HEADER === */}
@@ -491,6 +492,29 @@ export default function App() {
         </div>
       </div>
 
+      {/* FOOTER / CREDITS */}
+      <div className="mt-12 text-center opacity-80 hover:opacity-100 transition-opacity">
+        <p className="flex items-center justify-center gap-2 text-sm text-slate-400 font-medium">
+          <span className="opacity-70">Open Source Project</span>
+          <span className="w-1 h-1 rounded-full bg-slate-300"></span>
+          <a
+            rel="noopener noreferrer"
+            target="_blank"
+            href="https://github.com/hutomosaktikartiko/allcrypt"
+            className="flex items-center gap-1.5 hover:text-indigo-500 transition-colors group"
+          >
+            <IconGithub
+              size={16}
+              className="text-slate-400 group-hover:text-indigo-500 transition-colors"
+            />
+            <span>View on GitHub</span>
+          </a>
+        </p>
+        <p className="text-[10px] text-slate-300 mt-2 font-medium tracking-wide">
+          BUILT WITH REACT, TAILWIND & WEBASSEMBLY
+        </p>
+      </div>
+
       {/* Toast Notification */}
       {toast && (
         <div
@@ -515,7 +539,9 @@ export default function App() {
               <IconWarning size={22} />
             )}
           </div>
-          <p className="font-semibold text-sm text-slate-800">{toast.message}</p>
+          <p className="font-semibold text-sm text-slate-800">
+            {toast.message}
+          </p>
         </div>
       )}
 

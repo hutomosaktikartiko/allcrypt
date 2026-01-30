@@ -185,5 +185,5 @@ Result is streamed and downloaded as single file
 
 - [x] Vite + WASM integration
 - [x] Bun-based local dev
-- [ ] Production build
-- [ ] Deploy to Cloudflare Pages
+- [x] Production build
+- [x] Deploy to Cloudflare Pages
