@@ -212,7 +212,7 @@ export default function App() {
         processedData.byteOffset,
         processedData.byteOffset + processedData.byteLength,
       ) as ArrayBuffer;
-      const blob = new Blob([buf]);
+      const blob = new Blob([buf], { type: 'application/octet-stream' });
       const url = URL.createObjectURL(blob);
 
       const a = document.createElement("a");
